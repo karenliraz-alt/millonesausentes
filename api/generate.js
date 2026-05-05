@@ -19,14 +19,39 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        input: { prompt, aspect_ratio: '1:1', output_format: 'png', output_quality: 90, num_outputs: 1 }
+        input: {
+          prompt: prompt,
+          aspect_ratio: '1:1',
+          output_format: 'png',
+          output_quality: 90,
+          num_outputs: 1
+        }
       })
     });
 
     const prediction = await createResp.json();
-    if (!prediction.id) return res.status(500).json({ error: prediction.detail || 'Error' });
+
+    if (!prediction.id) {
+      return res.status(500).json({ error: prediction.detail || 'Error al crear prediccion' });
+    }
 
     for (let i = 0; i < 40; i++) {
       await new Promise(r => setTimeout(r, 2000));
       const poll = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
-        headers: { 'Authorization': `B
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const result = await poll.json();
+      if (result.status === 'succeeded' && result.output) {
+        return res.status(200).json({ imageUrl: result.output[0] });
+      }
+      if (result.status === 'failed') {
+        return res.status(500).json({ error: result.error || 'Generacion fallida' });
+      }
+    }
+
+    return res.status(500).json({ error: 'Tiempo agotado' });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
