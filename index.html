@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>12 de Mayo · #MillonesAusentes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--p:#7B5EA7;--pd:#3D1F6E;--pl:#B99FD8;--pale:#F5F0FC;--text:#1a1025;--muted:#7B6F8A;--white:#FEFCFF;}
+body{font-family:'Jost',sans-serif;background:var(--white);color:var(--text);min-height:100vh;}
+.hero{background:linear-gradient(135deg,#2A0A4E 0%,#4A1A7E 50%,#2A0A4E 100%);padding:56px 24px 48px;text-align:center;position:relative;overflow:hidden;}
+.hero-dots{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);background-size:32px 32px;}
+.badge{position:relative;display:inline-block;background:rgba(179,143,255,0.2);color:#D4B8F5;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;padding:7px 18px;border-radius:20px;margin-bottom:24px;border:1px solid rgba(179,143,255,0.3);}
+.hero h1{position:relative;font-family:'Cormorant Garamond',serif;font-size:clamp(32px,7vw,56px);color:#fff;line-height:1.1;margin-bottom:16px;font-weight:300;}
+.hero h1 em{color:#C4A0F0;font-style:normal;font-weight:600;}
+.hero p{position:relative;color:#C0B0D8;font-size:15px;font-weight:300;max-width:440px;margin:0 auto;line-height:1.7;}
+.container{max-width:580px;margin:0 auto;padding:40px 20px 80px;}
+.card{background:#fff;border:1px solid #EAE0F8;border-radius:20px;padding:32px 28px;margin-bottom:18px;box-shadow:0 2px 20px rgba(123,94,167,0.06);}
+.step-label{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--pl);margin-bottom:6px;}
+.card h2{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--pd);margin-bottom:22px;font-weight:400;}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;margin-top:18px;letter-spacing:0.5px;text-transform:uppercase;}
+label:first-of-type{margin-top:0;}
+input[type="text"]{width:100%;padding:13px 16px;border:1.5px solid #E0D4F5;border-radius:12px;font-size:16px;font-family:'Jost',sans-serif;color:var(--text);background:var(--pale);outline:none;transition:border-color 0.2s;}
+input[type="text"]:focus{border-color:var(--p);background:#fff;}
+.shoe-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+.shoe-option{border:1.5px solid #E0D4F5;border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;background:var(--pale);text-align:left;}
+.shoe-option:hover{border-color:var(--pl);background:#EDE4F8;}
+.shoe-option.sel{border-color:var(--p);background:#EDE4F8;box-shadow:0 0 0 3px rgba(123,94,167,0.1);}
+.shoe-icon{font-size:24px;margin-bottom:6px;}
+.shoe-name{font-size:13px;font-weight:500;color:var(--pd);}
+.shoe-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.color-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.cbtn{width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:transform 0.15s;outline:none;}
+.cbtn:hover{transform:scale(1.18);}
+.cbtn.sel{border-color:var(--pd);transform:scale(1.18);}
+.color-lbl{font-size:12px;color:var(--muted);margin-top:8px;font-style:italic;}
+.gen-btn{width:100%;padding:18px;background:linear-gradient(135deg,var(--pd),var(--p));color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:500;font-family:'Jost',sans-serif;cursor:pointer;transition:opacity 0.2s;margin-top:10px;}
+.gen-btn:hover{opacity:0.9;}
+.gen-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.loading{display:none;text-align:center;padding:32px 16px;}
+.loading.vis{display:block;}
+.loader{width:48px;height:48px;border:3px solid #EAE0F8;border-top-color:var(--p);border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.prog-bar{width:100%;height:3px;background:#EAE0F8;border-radius:2px;margin-top:16px;overflow:hidden;display:none;}
+.prog-bar.vis{display:block;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--pd),var(--p));border-radius:2px;width:0%;transition:width 0.6s ease;}
+.result{display:none;}
+.result.vis{display:block;}
+.result-img{width:100%;border-radius:16px;margin-bottom:18px;box-shadow:0 8px 40px rgba(123,94,167,0.15);}
+.dl-btn{width:100%;padding:15px;background:#fff;color:var(--p);border:2px solid var(--p);border-radius:14px;font-size:15px;font-weight:500;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;margin-bottom:12px;}
+.dl-btn:hover{background:var(--p);color:#fff;}
+.share-box{background:var(--pale);border-radius:14px;padding:16px 18px;font-size:13px;color:var(--muted);line-height:1.7;text-align:center;}
+.share-box strong{color:var(--pd);}
+.err{background:#FFF0F0;border:1px solid #F5C0C0;border-radius:12px;padding:14px 16px;font-size:13px;color:#A03030;display:none;margin-top:12px;}
+.err.vis{display:block;}
+.footer{text-align:center;padding:32px 24px;font-size:11px;color:#C0B0D8;letter-spacing:1px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-dots"></div>
+  <div class="badge">12 de Mayo 2026</div>
+  <h1>Somos<br/><em>#MillonesAusentes</em></h1>
+  <p>Crea tu imagen de protesta frente al Palacio de La Moneda. Tu zapato, tu nombre, tu voz.</p>
+</div>
+<div class="container">
+  <div class="card">
+    <div class="step-label">Paso 1 de 3</div>
+    <h2>¿Cuál es tu nombre?</h2>
+    <label for="nombre">Tu nombre</label>
+    <input type="text" id="nombre" placeholder="Ej: Karen" maxlength="40"/>
+  </div>
+  <div class="card">
+    <div class="step-label">Paso 2 de 3</div>
+    <h2>Elige tu zapato</h2>
+    <div class="shoe-grid">
+      <div class="shoe-option sel" data-shoe="elegant stiletto high heels" onclick="selShoe(this)">
+        <div class="shoe-icon">👠</div><div class="shoe-name">Tacón alto</div><div class="shoe-desc">Stiletto ejecutivo</div>
+      </div>
+      <div class="shoe-option" data-shoe="elegant low heel pumps" onclick="selShoe(this)">
+        <div class="shoe-icon">👡</div><div class="shoe-name">Tacón bajo</div><div class="shoe-desc">Pump elegante</div>
+      </div>
+      <div class="shoe-option" data-shoe="running sneakers" onclick="selShoe(this)">
+        <div class="shoe-icon">👟</div><div class="shoe-name">Zapatilla</div><div class="shoe-desc">Deportiva</div>
+      </div>
+      <div class="shoe-option" data-shoe="flat sandals" onclick="selShoe(this)">
+        <div class="shoe-icon">🩴</div><div class="shoe-name">Sandalia</div><div class="shoe-desc">Plana o con tira</div>
+      </div>
+      <div class="shoe-option" data-shoe="ankle boots" onclick="selShoe(this)">
+        <div class="shoe-icon">👢</div><div class="shoe-name">Bota</div><div class="shoe-desc">Corta de cuero</div>
+      </div>
+      <div class="shoe-option" data-shoe="loafers flat shoes" onclick="selShoe(this)">
+        <div class="shoe-icon">🥿</div><div class="shoe-name">Zapato plano</div><div class="shoe-desc">Cómodo y casual</div>
+      </div>
+    </div>
+    <label>Color</label>
+    <div class="color-row">
+      <button class="cbtn sel" style="background:#7B5EA7;" data-color="purple" data-name="Violeta" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#E53935;" data-color="red" data-name="Rojo" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#1E88E5;" data-color="blue" data-name="Azul" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#111;" data-color="black" data-name="Negro" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#D4A56A;" data-color="nude beige" data-name="Nude" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#E91E8C;" data-color="hot pink" data-name="Rosado" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#F0EEF5;border:1px solid #ccc;" data-color="white" data-name="Blanco" onclick="selColor(this)"></button>
+      <button class="cbtn" style="background:#6D4C41;" data-color="brown" data-name="Café" onclick="selColor(this)"></button>
+    </div>
+    <div class="color-lbl" id="colorLbl">Color seleccionado: Violeta</div>
+  </div>
+  <div class="card">
+    <div class="step-label">Paso 3 de 3</div>
+    <h2>Genera tu imagen</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.7;">Tu foto aparecerá frente al Palacio de La Moneda. Tarda unos 30 segundos.</p>
+    <button class="gen-btn" id="genBtn" onclick="generar()">✨ Crear mi imagen</button>
+    <div class="prog-bar" id="progBar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="loading" id="loading"><div class="loader"></div><p>Creando tu imagen...<br/><span style="font-size:12px;opacity:0.7;">Esto tarda unos 30 segundos</span></p></div>
+    <div class="err" id="errMsg"></div>
+  </div>
+  <div class="result card" id="result">
+    <div class="step-label">¡Lista para compartir!</div>
+    <h2>Tu imagen está lista 💜</h2>
+    <img id="resImg" class="result-img" src="" alt="Tu imagen de protesta"/>
+    <button class="dl-btn" onclick="descargar()">Descargar imagen</button>
+    <div class="share-box">Comparte con<br/><strong>#Fibromialgia #FatigaCrónica #MillonesAusentes #DolorCrónico</strong></div>
+  </div>
+</div>
+<div class="footer">Campaña #MillonesAusentes · 12 de Mayo · Día Mundial de la Fibromialgia y Fatiga Crónica</div>
+<script>
+let shoe='elegant stiletto high heels',color='purple',imgUrl='';
+function selShoe(el){document.querySelectorAll('.shoe-option').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');shoe=el.dataset.shoe;}
+function selColor(el){document.querySelectorAll('.cbtn').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');color=el.dataset.color;document.getElementById('colorLbl').textContent='Color seleccionado: '+el.dataset.name;}
+function buildPrompt(nombre){return `Bright daylight photorealistic scene, extreme close-up macro shot of brand new shiny ${color} ${shoe}, luxurious texture, pristine perfect condition, resting on light gray stone pavement. The shoe fills 65% of the frame. A large white paper card lying flat on the pavement in front of the shoe, horizontal, well lit, text written in thin elegant dark ink reads exactly: "${nombre} - Ausente por Fibromialgia". Background softly blurred showing hundreds of colorful empty shoes scattered across the sunny plaza in front of the Palacio de La Moneda in Santiago Chile, neoclassical white stone facade with Chilean flag, beautiful bokeh effect. At the bottom of the image, a clean elegant purple banner occupying 25% of the image height, with thin light-weight sans-serif white letters, text reads exactly: "12 de Mayo - Dia Mundial de la Fibromialgia y Fatiga Cronica" and below: "#Fibromialgia #FatigaCronica #MillonesAusentes #DolorCronico". Warm bright daylight, clear blue sky, sharp focus on shoe and card. Documentary photography style, 85mm lens.`;}
+async function generar(){
+  const nombre=document.getElementById('nombre').value.trim();
+  if(!nombre){alert('Por favor escribe tu nombre primero 💜');return;}
+  const btn=document.getElementById('genBtn');
+  const loading=document.getElementById('loading');
+  const progBar=document.getElementById('progBar');
+  const progFill=document.getElementById('progFill');
+  const errMsg=document.getElementById('errMsg');
+  const result=document.getElementById('result');
+  btn.disabled=true;btn.textContent='Generando...';
+  loading.classList.add('vis');progBar.classList.add('vis');
+  errMsg.classList.remove('vis');result.classList.remove('vis');
+  progFill.style.width='0%';
+  let prog=0;
+  const iv=setInterval(()=>{prog=Math.min(prog+1.2,88);progFill.style.width=prog+'%';},500);
+  try{
+    const resp=await fetch('/api/generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:buildPrompt(nombre)})
+    });
+    const data=await resp.json();
+    if(data.imageUrl){
+      imgUrl=data.imageUrl;
+      clearInterval(iv);progFill.style.width='100%';
+      document.getElementById('resImg').src=imgUrl;
+      result.classList.add('vis');loading.classList.remove('vis');
+      setTimeout(()=>result.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    }else{throw new Error(data.error||'Error generando imagen');}
+  }catch(e){
+    clearInterval(iv);loading.classList.remove('vis');progBar.classList.remove('vis');
+    errMsg.textContent='Hubo un problema: '+e.message;errMsg.classList.add('vis');
+  }finally{btn.disabled=false;btn.textContent='✨ Crear mi imagen';}
+}
+async function descargar(){
+  if(!imgUrl)return;
+  const nombre=document.getElementById('nombre').value.trim()||'MiImagen';
+  try{const r=await fetch(imgUrl);const b=await r.blob();const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=nombre+'_MillonesAusentes_12Mayo.png';a.click();URL.revokeObjectURL(u);}
+  catch{window.open(imgUrl,'_blank');}
+}
+</script>
+</body>
+</html>
