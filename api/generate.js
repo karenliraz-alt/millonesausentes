@@ -7,8 +7,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
-    const { prompt } = req.body;
+    const { nombre, shoe, color } = req.body;
     const token = process.env.REPLICATE_API_TOKEN;
+
+    const prompt = `Bright daylight photorealistic scene, extreme close-up macro shot of brand new shiny ${color} ${shoe}, luxurious leather texture, pristine perfect condition, resting on light gray stone pavement, THE SHOE FILLS 70% OF THE FRAME in sharp focus. A large white paper card lying flat on the pavement in front of the shoe, horizontal, well lit, elegant handwritten dark ink text reads exactly: "${nombre} - Ausente por Fibromialgia". Background shows hundreds of colorful empty shoes scattered across the sunny wide plaza in front of the Palacio de La Moneda in Santiago de Chile, the exact neoclassical Chilean government palace with white stone facade, tall columns, ornate windows and Chilean flag flying on top, beautiful bokeh blur. Warm bright daylight, clear blue sky. Emotional protest documentary photography, 85mm portrait lens, shallow depth of field, professional photography.`;
 
     const createResp = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
       method: 'POST',
