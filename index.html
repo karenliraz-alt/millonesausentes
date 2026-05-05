@@ -47,7 +47,11 @@ input[type="text"]:focus{border-color:var(--p);background:#fff;}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--pd),var(--p));border-radius:2px;width:0%;transition:width 0.6s ease;}
 .result{display:none;}
 .result.vis{display:block;}
-.result-img{width:100%;border-radius:16px;margin-bottom:18px;box-shadow:0 8px 40px rgba(123,94,167,0.15);}
+.result-wrap{position:relative;border-radius:16px;overflow:hidden;margin-bottom:18px;box-shadow:0 8px 40px rgba(123,94,167,0.15);}
+.result-img{width:100%;display:block;}
+.result-banner{background:#6B3FA0;padding:12px 16px;text-align:center;}
+.result-banner .titulo{color:#fff;font-size:13px;font-weight:500;letter-spacing:0.3px;margin-bottom:4px;}
+.result-banner .hashtags{color:#D4B8F5;font-size:11px;letter-spacing:0.5px;}
 .dl-btn{width:100%;padding:15px;background:#fff;color:var(--p);border:2px solid var(--p);border-radius:14px;font-size:15px;font-weight:500;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;margin-bottom:12px;}
 .dl-btn:hover{background:var(--p);color:#fff;}
 .share-box{background:var(--pale);border-radius:14px;padding:16px 18px;font-size:13px;color:var(--muted);line-height:1.7;text-align:center;}
@@ -119,9 +123,15 @@ input[type="text"]:focus{border-color:var(--p);background:#fff;}
   <div class="result card" id="result">
     <div class="step-label">¡Lista para compartir!</div>
     <h2>Tu imagen está lista 💜</h2>
-    <img id="resImg" class="result-img" src="" alt="Tu imagen de protesta"/>
+    <div class="result-wrap">
+      <img id="resImg" class="result-img" src="" alt="Tu imagen de protesta"/>
+      <div class="result-banner">
+        <div class="titulo">12 de Mayo · Día Mundial de la Fibromialgia y Fatiga Crónica</div>
+        <div class="hashtags">#Fibromialgia · #FatigaCrónica · #MillonesAusentes · #DolorCrónico</div>
+      </div>
+    </div>
     <button class="dl-btn" onclick="descargar()">Descargar imagen</button>
-    <div class="share-box">Comparte con<br/><strong>#Fibromialgia #FatigaCrónica #MillonesAusentes #DolorCrónico</strong></div>
+    <div class="share-box">Comparte en Instagram y LinkedIn con<br/><strong>#Fibromialgia #FatigaCrónica #MillonesAusentes #DolorCrónico</strong></div>
   </div>
 </div>
 <div class="footer">Campaña #MillonesAusentes · 12 de Mayo · Día Mundial de la Fibromialgia y Fatiga Crónica</div>
@@ -129,7 +139,6 @@ input[type="text"]:focus{border-color:var(--p);background:#fff;}
 let shoe='elegant stiletto high heels',color='purple',imgUrl='';
 function selShoe(el){document.querySelectorAll('.shoe-option').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');shoe=el.dataset.shoe;}
 function selColor(el){document.querySelectorAll('.cbtn').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');color=el.dataset.color;document.getElementById('colorLbl').textContent='Color seleccionado: '+el.dataset.name;}
-function buildPrompt(nombre){return `Bright daylight photorealistic scene, extreme close-up macro shot of brand new shiny ${color} ${shoe}, luxurious texture, pristine perfect condition, resting on light gray stone pavement. The shoe fills 65% of the frame. A large white paper card lying flat on the pavement in front of the shoe, horizontal, well lit, text written in thin elegant dark ink reads exactly: "${nombre} - Ausente por Fibromialgia". Background softly blurred showing hundreds of colorful empty shoes scattered across the sunny plaza in front of the Palacio de La Moneda in Santiago Chile, neoclassical white stone facade with Chilean flag, beautiful bokeh effect. At the bottom of the image, a clean elegant purple banner occupying 25% of the image height, with thin light-weight sans-serif white letters, text reads exactly: "12 de Mayo - Dia Mundial de la Fibromialgia y Fatiga Cronica" and below: "#Fibromialgia #FatigaCronica #MillonesAusentes #DolorCronico". Warm bright daylight, clear blue sky, sharp focus on shoe and card. Documentary photography style, 85mm lens.`;}
 async function generar(){
   const nombre=document.getElementById('nombre').value.trim();
   if(!nombre){alert('Por favor escribe tu nombre primero 💜');return;}
@@ -149,7 +158,7 @@ async function generar(){
     const resp=await fetch('/api/generate',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:buildPrompt(nombre)})
+      body:JSON.stringify({nombre,shoe,color})
     });
     const data=await resp.json();
     if(data.imageUrl){
@@ -167,8 +176,11 @@ async function generar(){
 async function descargar(){
   if(!imgUrl)return;
   const nombre=document.getElementById('nombre').value.trim()||'MiImagen';
-  try{const r=await fetch(imgUrl);const b=await r.blob();const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=nombre+'_MillonesAusentes_12Mayo.png';a.click();URL.revokeObjectURL(u);}
-  catch{window.open(imgUrl,'_blank');}
+  try{
+    const r=await fetch(imgUrl);const b=await r.blob();
+    const u=URL.createObjectURL(b);const a=document.createElement('a');
+    a.href=u;a.download=nombre+'_MillonesAusentes_12Mayo.png';a.click();URL.revokeObjectURL(u);
+  }catch{window.open(imgUrl,'_blank');}
 }
 </script>
 </body>
