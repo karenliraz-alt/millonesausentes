@@ -53,7 +53,31 @@ export default async function handler(req, res) {
     );
     const data = await imgResp.json();
     if (data.predictions && data.predictions[0]?.bytesBase64Encoded) {
-      return res.status(200).json({ imageUrl: `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}` });
+      const imageBase64 = data.predictions[0].bytesBase64Encoded;
+
+      try {
+        const githubToken = process.env.GITHUB_TOKEN;
+        const repo = 'karenliraz-alt/millonesausentes';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const nombreLimpio = nombre.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '').trim().replace(/\s+/g, '_');
+        const fileName = `imagenes/${nombreLimpio}_${timestamp}.png`;
+
+        await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Imagen generada: ${nombre}`,
+            content: imageBase64
+          })
+        });
+      } catch (githubError) {
+        console.error('Error guardando en GitHub:', githubError);
+      }
+
+      return res.status(200).json({ imageUrl: `data:image/png;base64,${imageBase64}` });
     } else {
       return res.status(500).json({ error: data.error?.message || JSON.stringify(data) });
     }
