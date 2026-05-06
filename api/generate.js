@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const prompt = `A realistic and moving close-up photograph taken at Plaza de la Ciudadania in Santiago, Chile, during a sunny day. In the extreme foreground, resting on the gray paved ground, is a single ${color} ${shoe} (representing fibromyalgia awareness). Resting against the shoe is a square white card with neatly handwritten blue ink text in Spanish: "${nombre}, ausente por fibromialgia". The camera is at ground level, focused sharply on the shoe and the card. Behind it, filling the middle ground, hundreds of diverse pairs of empty shoes (sneakers, boots, flats, loafers) are laid out in rows, stretching toward the background. The shoes are colorful but static, emphasizing collective absence. In the background, blurred but clearly identifiable, is the facade of La Moneda Palace, with the Chilean flag flying prominently from the central rooftop. Large commercial buildings line the background on both sides under a clear, bright blue sky.`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${token}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generate-001:predict?key=${token}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,6 +39,4 @@ export default async function handler(req, res) {
     }
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-}
+    ret
