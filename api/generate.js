@@ -8,48 +8,35 @@ export default async function handler(req, res) {
 
   try {
     const { nombre, shoe, color } = req.body;
-    const token = process.env.REPLICATE_API_TOKEN;
+    const token = process.env.GEMINI_API_KEY;
 
-    const prompt = `Professional protest documentary photograph. Camera at ground level worm eye view, 85mm lens f/1.8. CENTER FOREGROUND ultra sharp focus: one ${color} ${shoe} on gray granite tiles filling bottom 55% of frame. Leaning against shoe: white paper card clearly legible large text: "${nombre} - Ausente por Fibromialgia". MIDDLE GROUND: pairs of empty shoes in loose human-placed rows, varied styles and colors side by side: red sneakers pair, yellow boots pair, black oxfords pair, blue sandals pair, brown boots pair, pink flats pair. TOP THIRD blurred bokeh: Palacio La Moneda Santiago Chile, ABSOLUTELY FLAT ROOFLINE no dome no clock no tower no cupola, pure white neoclassical building, single long horizontal two-story facade, evenly spaced rectangular windows, large central rounded arch entrance, Chilean flag red white blue horizontal stripes white star flying on straight flat roof, wide open plaza, clear sunny blue sky, warm golden sunlight, NO trees NO people.`;
+    const prompt = `A realistic and moving close-up photograph taken at Plaza de la Ciudadania in Santiago, Chile, during a sunny day. In the extreme foreground, resting on the gray paved ground, is a single ${color} ${shoe} (representing fibromyalgia awareness). Resting against the shoe is a square white card with neatly handwritten blue ink text in Spanish: "${nombre}, ausente por fibromialgia". The camera is at ground level, focused sharply on the shoe and the card. Behind it, filling the middle ground, hundreds of diverse pairs of empty shoes (sneakers, boots, flats, loafers) are laid out in rows, stretching toward the background. The shoes are colorful but static, emphasizing collective absence. In the background, blurred but clearly identifiable, is the facade of La Moneda Palace, with the Chilean flag flying prominently from the central rooftop. Large commercial buildings line the background on both sides under a clear, bright blue sky.`;
 
-    const createResp = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        input: {
-          prompt: prompt,
-          aspect_ratio: '1:1',
-          output_format: 'png',
-          output_quality: 90,
-          num_outputs: 1
-        }
-      })
-    });
-
-    const prediction = await createResp.json();
-
-    if (!prediction.id) {
-      return res.status(500).json({ error: prediction.detail || 'Error al crear prediccion' });
-    }
-
-    for (let i = 0; i < 40; i++) {
-      await new Promise(r => setTimeout(r, 2000));
-      const poll = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const result = await poll.json();
-      if (result.status === 'succeeded' && result.output) {
-        return res.status(200).json({ imageUrl: result.output[0] });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${token}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instances: [{ prompt }],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: '1:1',
+            safetyFilterLevel: 'block_few'
+          }
+        })
       }
-      if (result.status === 'failed') {
-        return res.status(500).json({ error: result.error || 'Generacion fallida' });
-      }
-    }
+    );
 
-    return res.status(500).json({ error: 'Tiempo agotado' });
+    const data = await response.json();
+
+    if (data.predictions && data.predictions[0]?.bytesBase64Encoded) {
+      const base64 = data.predictions[0].bytesBase64Encoded;
+      const imageUrl = `data:image/png;base64,${base64}`;
+      return res.status(200).json({ imageUrl });
+    } else {
+      return res.status(500).json({ error: data.error?.message || 'Error generando imagen' });
+    }
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
